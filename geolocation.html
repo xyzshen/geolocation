@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>HTMl5地理定位</title>
+</head>
+
+<body>
+    <p id='demo'></p>
+    <button onclick="getLocation()">点我</button>
+    <div id="mapholder"></div>
+    <div id="container"></div>
+    <script src="http://map.qq.com/api/js?v=2.exp" type="text/javascript"></script>
+    <script>
+        var x = document.getElementById('demo');
+        var clientWidth = document.documentElement.clientWidth,
+            clientHeight = document.documentElement.clientHeight;
+        var container = document.getElementById('container');
+            container.style.width = clientWidth + 'px';
+            container.style.height = clientHeight + 'px';
+        function getLocation() {
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition, errPosition);
+            } else {
+                x.innerHTML = '该浏览器不支持定位'
+            }
+        }
+        function showPosition(position) {
+            x.innerHTML = "纬度: " + position.coords.latitude +
+                "<br>经度: " + position.coords.longitude +
+                '<br>精度' + position.coords.accuracy +
+                '<br>海拔精度' + position.coords.altitudeAccuracy +
+                '<br>响应时间' + position.coords.timestamp;
+
+            var latitude = position.coords.latitude;
+            var longitude = position.coords.longitude;
+            //腾讯地图的中心地理坐标
+            var center = new qq.maps.LatLng(latitude, longitude);
+            //使用腾讯地图API
+            var map = new qq.maps.Map(document.getElementById("container"),{
+                center : center,
+                zoom : 16
+            });
+            //在地图中创建信息提示窗口
+            var infoWin = new qq.maps.InfoWindow({
+                map: map
+            });
+            //打开信息窗口
+            infoWin.open();
+            //设置信息窗口显示区的内容
+            infoWin.setContent('<div style="width:200px;padding:10px;">' +
+            '您在这里<br/>纬度：' + latitude + '<br/>经度：' + longitude);
+            //设置信息窗口的位置
+            infoWin.setPosition(center);
+        }
+        function errPosition(error) {
+            switch (error.code) {
+                case error.PERMISSION_DENIED:
+                    x.innerHTML = '用户拒绝对获取地理位置的请求'
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    x.innerHTML = '位置信息是不可用的'
+                    break;
+                case error.TIMEOUT:
+                    x.innerHTML = '请求用户地理位置超时'
+                    break;
+                case error.UNKNOWN_ERROR:
+                    x.innerHTML = '未知错误'
+                    break;
+            }
+        }
+        // window.onload = getLocation;
+    </script>
+</body>
+
+</html>
